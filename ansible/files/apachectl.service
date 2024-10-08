@@ -1,0 +1,16 @@
+[Unit]
+Description=CollabNet Apache SVN Server
+
+[Service]
+Type=forking
+User=root
+Group=root
+TimeoutStartSec=180s
+TimeoutStopSec=180s
+TimeoutSec=300
+ExecStart=/bin/bash /opt/CollabNet_Subversion/bin/apachectl start
+ExecStop=/bin/bash /opt/CollabNet_Subversion/bin/apachectl stop
+ExecReload=/bin/bash /opt/CollabNet_Subversion/bin/apachectl reload
+Restart=no
+
+[Install]
