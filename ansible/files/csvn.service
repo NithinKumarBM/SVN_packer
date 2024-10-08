@@ -1,0 +1,17 @@
+[Unit]
+Description=CollabNet SVN Server
+
+[Service]
+Type=forking
+User=csvn
+Group=csvn
+TimeoutStartSec=180s
+TimeoutStopSec=180s
+TimeoutSec=300
+ExecStart=/bin/bash /opt/CollabNet_Subversion/bin/csvn start
+ExecStop=/bin/bash /opt/CollabNet_Subversion/bin/csvn stop
+ExecReload=/bin/bash /opt/CollabNet_Subversion/bin/csvn reload
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
