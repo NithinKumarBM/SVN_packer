@@ -1,0 +1,93 @@
+    - name: Check if SVN package exists
+      stat:
+       path: "/opt/pv/sources/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz"
+      register: svn_package
+
+    - name: Fail if SVN package does not exist
+      fail:
+       msg: "The SVN package file does not exist at the specified path."
+      when: not svn_package.stat.exists
+
+    - name: Verify the SVN package is a valid tar.gz
+      command: tar -tzf /opt/pv/sources/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz
+      register: tar_check
+
+    - name: Fail if the SVN package is not a valid tar.gz
+      fail:
+        msg: "SVN package file is not a valid tar.gz archive!"
+      when: tar_check.rc != 0
+
+    - name: Extract SVN package to /opt/
+      unarchive:
+        src: /opt/pv/sources/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz
+        dest: /opt/
+        owner: csvn
+        group: csvn
+        remote_src: yes
+      when: tar_check.rc == 0
+
+    - name: Move csvn directory to /opt/CollabNet_Subversion
+      command: mv /opt/csvn /opt/CollabNet_Subversion
+
+    - name: Change ownership of /opt/CollabNet_Subversion
+      file:
+        path: /opt/CollabNet_Subversion
+        owner: csvn
+        group: csvn
+        recurse: yes
+
+    - name: Change ownership of /opt/CollabNet_Subversion/lib/httpd_bind/httpd_bind
+      file:
+        path: /opt/CollabNet_Subversion/lib/httpd_bind/httpd_bind
+        owner: root
+        group: csvn
+
+    - name: Copy the apache bootstarp files
+      copy:
+        src: ./files/apachectl.service
+        dest: /usr/lib/systemd/system/apachectl.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy the csvn bootstrap files
+      copy:
+        src: ./files/csvn.service
+        dest: /usr/lib/systemd/system/csvn.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Start csvn service
+      systemd:
+        name: csvn
+        state: started
+
+    - name: Pause for 200 seconds
+      pause:
+        seconds: 200
+
+    - name: Stop csvn service
+      systemd:
+        name: csvn
+        state: stopped
+
+    - name: Pause for 180 seconds
+      pause:
+        seconds: 180
+
+    - name: Move csvn directory to home directory
+      command: mv /opt/CollabNet_Subversion /home/ec2-user/
+
+    - name: Remove the SVN tar file from /opt/pv/sources
+      file:
+        path: /opt/pv/sources/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz
+        state: absent
+
+    - name: Print success message
+      debug:
+        msg: "CSVN Installed successfully"
