@@ -1,0 +1,11 @@
+  - name: Update repositories
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Sync package files from S3 bucket
+    aws_s3:
+      bucket: "lx-euc1-s3-production-software-sources"
+      object: "SVN/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz"
+      dest: "/opt/pv/sources/CollabNetSubversionEdge-5.2.4_linux-x86_64.tar.gz"
+      mode: get

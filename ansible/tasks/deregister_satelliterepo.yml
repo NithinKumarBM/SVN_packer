@@ -1,0 +1,7 @@
+- name: Unregister Linux server with Subscription Manager
+  ansible.builtin.shell:
+    cmd: '{{ item }}'
+  loop:
+    - 'subscription-manager unregister'
+    - 'subscription-manager clean'
+    - '[[ -d /var/cache/dnf ]] && rm -rf /var/cache/dnf/*'

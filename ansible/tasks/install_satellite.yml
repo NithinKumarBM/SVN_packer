@@ -1,0 +1,22 @@
+    - name: Copy satellite shell script to destination
+      copy:
+        src: ./scripts/satellite_register_client.sh
+        dest: /opt/pv/sources/satellite_register_client.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy Hostname python script to destination
+      copy:
+        src: ./files/set_hostname.py
+        dest: /opt/pv/sources/set_hostname.py
+        owner: root
+        group: root
+        mode: '0755' 
+
+    - name:  execute the script to register the satellite repo
+      shell: |
+        sed -i 's/\r$//' /opt/pv/sources/satellite_register_client.sh
+        /bin/bash /opt/pv/sources/satellite_register_client.sh
+      args:
+        executable: /bin/bash

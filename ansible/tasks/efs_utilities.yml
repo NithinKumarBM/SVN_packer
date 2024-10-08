@@ -1,0 +1,18 @@
+    - name: Install git, efs-utils, and other dependencies
+      yum:
+        name:
+          - git
+          - wget
+          - openssl-devel
+          - cargo
+          - make
+        state: present
+
+    - name: Install amazon-efs-utils
+      package:
+        name: amazon-efs-utils
+        state: present
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes

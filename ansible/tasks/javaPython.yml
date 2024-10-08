@@ -1,0 +1,41 @@
+    - name: Set default java version
+      alternatives:
+        name: java
+        path: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.422.b05-2.el8.x86_64/jre/bin/java
+
+    - name: Install Java 1.8.0 OpenJDK Development package
+      yum:
+        name: java-1.8.0-openjdk-devel
+        state: present
+
+    - name: Remove existing python symlink
+      file:
+        path: /opt/conda/envs/python-default/bin/python
+        state: absent
+
+    - name: Create a new Conda environment with Python 2.7
+      command: conda create -n python2-default python=2.7 -y
+      register: create_conda_env
+      ignore_errors: no
+
+    - name: Wait for Conda environment creation to complete
+      wait_for:
+        timeout: 300  # Adjust the timeout based on your estimation
+      when: create_conda_env.changed
+
+    - name: Remove /etc/profile.d/env-exports.sh
+      file:
+        path: /etc/profile.d/env-exports.sh
+        state: absent
+
+    - name: Copy environment file script to destination
+      copy:
+        src: ./files/env-exports.sh
+        dest: /etc/profile.d/env-exports.sh
+        owner: root
+        group: root
+        mode: '0744' 
+
+    - name: Source the env-exports.sh script
+      shell: source /etc/profile.d/env-exports.sh
+      ignore_errors: yes

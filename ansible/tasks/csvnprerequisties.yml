@@ -1,0 +1,29 @@
+    - name: Create csvn group
+      group:
+        name: csvn
+
+    - name: Create csvn user
+      user:
+        name: csvn
+        comment: "CSVN Server"
+        group: csvn
+        home: /usr/local/csvn
+
+    - name: Add csvn to sudoers
+      lineinfile:
+        path: /etc/sudoers
+        line: "csvn ALL=(ALL) NOPASSWD: ALL"
+        validate: 'visudo -cf %s'
+
+    - name: Configure sudoers for csvn
+      blockinfile:
+        path: /etc/sudoers
+        block: |
+          Defaults:csvn !requiretty
+          Defaults env_keep += "PYTHONPATH"
+        validate: 'visudo -cf %s'
+
+    - name: Remove password for csvn user
+      user:
+        name: csvn
+        password: "*"
