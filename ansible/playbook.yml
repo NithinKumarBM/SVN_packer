@@ -1,0 +1,29 @@
+---
+- name: 'Provision SVN Image'
+  hosts: all
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+
+   - name: Register the satellite repostories in AMI
+     include_tasks: tasks/install_satellite.yml
+
+   - name: Update OS with updated repo
+     include_tasks: tasks/installUpdates.yml
+
+   - name: Install EFS Utils
+     include_tasks: tasks/efs_utilities.yml
+
+   - name: Install Java and Python27
+     include_tasks: tasks/javaPython.yml
+
+   - name: run pretask csvn
+     include_tasks: tasks/csvnprerequisties.yml
+
+   - name: Install configure csvn
+     include_tasks: tasks/csvnconf.yml
+
+   - name: Deregister the satellite repo from the AMI
+     include_tasks: tasks/deregister_satelliterepo.yml
